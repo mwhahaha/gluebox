@@ -15,11 +15,16 @@ class MetadataUpdater(object):
         self.metadata = None
 
     def _parse(self):
+        if self.metadata:
+            return self.metadata
+
         json_file = '{}/metadata.json'.format(self.module_path)
         if not os.path.exists(json_file):
             raise MetadataJsonMissing()
         with open(json_file) as f:
             self.metadata = json.load(f)
+
+        return self.metadata
 
     def _parse_ver(self, ver_string):
         pattern = "([<>=]+)?\s*([0-9.]+)(-dev)?"
@@ -77,6 +82,10 @@ class MetadataUpdater(object):
                     dep['name'], dep['version_requirement']))
             updated_deps.append(dep)
         self.metadata['dependencies'] = updated_deps
+
+    def get_current_version(self):
+        self._parse()
+        return self.metadata['version']
 
     def major_bump(self, static_version=None, dev=False, skip_update_deps=False):
         self._parse()

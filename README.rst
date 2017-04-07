@@ -34,34 +34,35 @@ How to use
 
 remove -dev from version numbers (example: 10.0.0-dev -> 10.0.0)::
 
-    gluebox checkout -f modules.txt --topic prep-release-10.0.0
-    gluebox devbump -f modules.txt
-    gluebox commit -F release-message.txt -f modules.txt
-    gluebox pushreview -f modules.txt
-    gluebox cleanup -f modules.txt
+    gluebox git checkout -f modules.txt --topic prep-release-10.0.0
+    gluebox bump dev -f modules.txt
+    gluebox git commit -F release-message.txt -f modules.txt
+    gluebox git review -f modules.txt
+    gluebox git cleanup -f modules.txt
 
 minor version bump with -dev (example: 10.0.0 -> 10.1.0-dev)::
 
-    gluebox checkout -f modules.txt --topic minor-version-10.1.0-dev
-    gluebox minorbump -f modules.txt --dev
-    gluebox commit -F release-message.txt -f modules.txt
-    gluebox pushreview -f modules.txt
-    gluebox cleanup -f modules.txt
+    gluebox git checkout -f modules.txt --topic minor-version-10.1.0-dev
+    gluebox bump minor -f modules.txt --dev
+    gluebox git commit -F release-message.txt -f modules.txt
+    gluebox git review -f modules.txt
+    gluebox git cleanup -f modules.txt
 
 major version bump with -dev (example: 10.0.0 -> 11.0.0-dev)::
 
-    gluebox checkout -f modules.txt --topic major-version-11.0.0-dev
-    gluebox minorbump -f modules.txt --dev
-    gluebox commit -F release-message.txt -f modules.txt
-    gluebox pushreview -f modules.txt
-    gluebox cleanup -f modules.txt
+    gluebox git checkout -f modules.txt --topic major-version-11.0.0-dev
+    gluebox bump minor -f modules.txt --dev
+    gluebox git commit -F release-message.txt -f modules.txt
+    gluebox git review -f modules.txt
+    gluebox git cleanup -f modules.txt
 
 
 static version: (example: 10.1.1)::
 
-    gluebox checkout -m puppet-openstacklib --topic static-version-10.1.1
-    gluebox minorbump -m puppet-openstacklib --static-version 10.1.1
-    gluebox commit -F release-message.txt -m puppet-openstacklib
-    gluebox pushreview -m puppet-openstacklib
-    gluebox cleanup -m puppet-opesntacklib
+    gluebox git checkout -m puppet-openstacklib --topic static-version-10.1.1
+    gluebox bump minor -m puppet-openstacklib --static-version 10.1.1
+    gluebox git commit -F release-message.txt -m puppet-openstacklib
+    gluebox git review -m puppet-openstacklib
+    gluebox git cleanup -m puppet-opesntacklib
+
 
