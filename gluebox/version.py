@@ -3,7 +3,7 @@ import re
 import argparse
 
 from gluebox.base import GlueboxCommandBase
-from gluebox.utils.metadata import MetadataUpdater
+from gluebox.utils.metadata import MetadataManager
 
 
 class GlueboxVersionBase(GlueboxCommandBase):
@@ -44,7 +44,7 @@ class MajorBump(GlueboxVersionBase):
             self.app.stdout.write('MajorBump {} ... '.format(mod))
             self._check_module(parsed_args.workspace, mod)
             path = '{}/{}'.format(parsed_args.workspace, mod)
-            updater = MetadataUpdater(path, parsed_args.namespace)
+            updater = MetadataManager(path, parsed_args.namespace)
             v = updater.major_bump(static_version=parsed_args.static_version,
                                    dev=parsed_args.dev,
                                    skip_update_deps=parsed_args.skip_update_deps)
@@ -60,7 +60,7 @@ class MinorBump(GlueboxVersionBase):
             self.app.stdout.write('MinorBump {} ... '.format(mod))
             self._check_module(parsed_args.workspace, mod)
             path = '{}/{}'.format(parsed_args.workspace, mod)
-            updater = MetadataUpdater(path, parsed_args.namespace)
+            updater = MetadataManager(path, parsed_args.namespace)
             v= updater.minor_bump(static_version=parsed_args.static_version,
                                   dev=parsed_args.dev,
                                   skip_update_deps=parsed_args.skip_update_deps)
@@ -73,6 +73,6 @@ class DevBump(GlueboxVersionBase):
             self.app.stdout.write('DevBump {} ... '.format(mod))
             self._check_module(parsed_args.workspace, mod)
             path = '{}/{}'.format(parsed_args.workspace, mod)
-            updater = MetadataUpdater(path, parsed_args.namespace)
+            updater = MetadataManager(path, parsed_args.namespace)
             v = updater.dev_remove(static_version=parsed_args.static_version)
             self.app.stdout.write('{}\n'.format(v))
