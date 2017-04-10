@@ -40,8 +40,9 @@ class GlueboxReleaseBase(GlueboxCommandBase):
             with open(release_file, 'r') as rfile:
                 data = yaml.load(rfile)
 
+            releases = []
             if 'releases' not in data:
-                releases = [info]
+                releases.append(info)
             else:
                 for v in data['releases']:
                     if v['version'] == info['version']:
@@ -90,7 +91,7 @@ class NewRelease(GlueboxReleaseBase):
                             default=False,
                             help='Create a stable branch entry for the version'
                                  'being released.')
-        parser.add_argument('--static-version',
+        parser.add_argument('--static-version', default=None,
                             help='Specify a specific version to use for the '
                                  'release yaml files.')
         return parser
@@ -122,7 +123,7 @@ class UpdateRelease(GlueboxReleaseBase):
         parser.add_argument('review',
                             help='Gerrit review ID for the existing release '
                                  'update')
-        parser.add_argument('--static-version',
+        parser.add_argument('--static-version', default=None,
                             help='Specify a specific version to use for the '
                                  'release yaml files.')
         return parser
