@@ -82,3 +82,11 @@ update existing release patch::
     gluebox release update pike 455396 -f modules.txt
     gluebox git commit -a -m releases -F release-message.txt
     gluebox git review -m releases
+
+
+Create a patch for a non-puppet module::
+
+    gluebox git checkout -m some-project
+    gluebox release new pike -m some-project --static-version 1.0.0
+    gluebox git commit -m releases -F release-message.txt
+    gluebox git review -m releases
