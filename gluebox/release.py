@@ -122,6 +122,9 @@ class UpdateRelease(GlueboxReleaseBase):
         parser.add_argument('review',
                             help='Gerrit review ID for the existing release '
                                  'update')
+        parser.add_argument('--static-version',
+                            help='Specify a specific version to use for the '
+                                 'release yaml files.')
         return parser
 
     def take_action(self, parsed_args):
