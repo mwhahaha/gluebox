@@ -1,15 +1,17 @@
+import copy
 import logging
 import os
 import shutil
 import yaml
 
 from gluebox.base import GlueboxCommandBase
+from gluebox.base import GlueboxModuleCommandBase
 from gluebox.utils.metadata import MetadataManager
 import gluebox.utils.git as gitutils
 
 RELEASE_REPO = 'https://git.openstack.org/openstack/releases'
 
-class GlueboxReleaseBase(GlueboxCommandBase):
+class GlueboxReleaseBase(GlueboxModuleCommandBase):
     log = logging.getLogger(__name__)
 
     def get_parser(self, prog_name):
@@ -44,12 +46,17 @@ class GlueboxReleaseBase(GlueboxCommandBase):
             if 'releases' not in data:
                 releases.append(info)
             else:
-                for v in data['releases']:
-                    if v['version'] == info['version']:
-                        print("Found version {}, updating".format(v['version']))
-                        releases.append(info)
-                    else:
-                        releases.append(v)
+                if any(v['version'] == info['version'] for v in data['releases']):
+                    for v in data['releases']:
+                        if v['version'] == info['version']:
+                            print("Found version {} of {}, updating".format(
+                                v['version'], mod))
+                            releases.append(info)
+                        else:
+                            releases.append(v)
+                else:
+                    releases = data['releases']
+                    releases.append(info)
 
             data['releases'] = releases
 
@@ -68,7 +75,7 @@ class GlueboxReleaseBase(GlueboxCommandBase):
                 yaml.dump(data, rfile, explicit_start=True,
                           default_flow_style=False)
 
-class CleanupRelease(GlueboxReleaseBase):
+class CleanupRelease(GlueboxCommandBase):
     """Cleanup the releases workspace"""
     def take_action(self, parsed_args):
         workspace = os.path.abspath("{}/{}".format(

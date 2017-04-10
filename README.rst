@@ -51,7 +51,7 @@ minor version bump with -dev (example: 10.0.0 -> 10.1.0-dev)::
 major version bump with -dev (example: 10.0.0 -> 11.0.0-dev)::
 
     gluebox git checkout -f modules.txt --topic major-version-11.0.0-dev
-    gluebox bump minor -f modules.txt --dev
+    gluebox bump major -f modules.txt --dev
     gluebox git commit -F release-message.txt -f modules.txt
     gluebox git review -f modules.txt
     gluebox git cleanup -f modules.txt

@@ -2,11 +2,11 @@ import logging
 import re
 import argparse
 
-from gluebox.base import GlueboxCommandBase
+from gluebox.base import GlueboxModuleCommandBase
 from gluebox.utils.metadata import MetadataManager
 
 
-class GlueboxVersionBase(GlueboxCommandBase):
+class GlueboxVersionBase(GlueboxModuleCommandBase):
     log = logging.getLogger(__name__)
 
     def _static_version(self, str):

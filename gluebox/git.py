@@ -4,10 +4,10 @@ import subprocess
 import shutil
 
 import gluebox.utils.git as gitutil
-from gluebox.base import GlueboxCommandBase
+from gluebox.base import GlueboxModuleCommandBase
 
 
-class GlueboxGitBase(GlueboxCommandBase):
+class GlueboxGitBase(GlueboxModuleCommandBase):
     log = logging.getLogger(__name__)
 
     def _get_mod_path(self, workspace, module_name):

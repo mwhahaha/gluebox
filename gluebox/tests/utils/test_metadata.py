@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -12,17 +11,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""
-test_gluebox
-----------------------------------
-
-Tests for `gluebox` module.
-"""
-
-from gluebox.tests import base
+from oslotest import base
+from gluebox.utils.metadata import MetadataManager
 
 
-class TestGluebox(base.TestCase):
+class TestMetadata(base.BaseTestCase):
 
-    def test_something(self):
+    """Test case for metadata utils."""
+    def setUp(self):
+        super(TestMetadata, self).setUp()
+
+    def test_get_current_version(self):
+        pass
+
+    def test_major_bump(self):
+        pass
+
+    def test_minor_bump(self):
+        pass
+
+    def test_dev_remove(self):
         pass

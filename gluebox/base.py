@@ -17,12 +17,6 @@ class GlueboxCommandBase(Command):
         parser.add_argument('-w', '--workspace', default='workspace',
                             help='Workspace directory. Defaults to '
                                  'workspace')
-        modules = parser.add_mutually_exclusive_group(required=True)
-        modules.add_argument('-f', '--module-file', dest='module_file',
-                             help='File that contains a list of modules to '
-                                 'checkout')
-        modules.add_argument('-m', '--module', nargs='*', dest='module',
-                             help='Specific module to checkout')
         return parser
 
     def _get_modules(self, parsed_args):
@@ -39,3 +33,14 @@ class GlueboxCommandBase(Command):
         mod_path = '{}/{}'.format(workspace, module)
         if not os.path.exists(mod_path):
             raise ModuleNotCheckedOut()
+
+class GlueboxModuleCommandBase(GlueboxCommandBase):
+    def get_parser(self, prog_name):
+        parser = super(GlueboxModuleCommandBase, self).get_parser(prog_name)
+        modules = parser.add_mutually_exclusive_group(required=True)
+        modules.add_argument('-f', '--module-file', dest='module_file',
+                             help='File that contains a list of modules to '
+                                 'checkout')
+        modules.add_argument('-m', '--module', nargs='*', dest='module',
+                             help='Specific module to checkout')
+        return parser

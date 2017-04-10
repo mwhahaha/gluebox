@@ -47,7 +47,7 @@ def commit(workspace, message=None, message_file=None, fixup=False):
     if fixup:
         git_opts = '--amend --no-edit'
     elif message:
-        git_opts = '-m {}'.format(message)
+        git_opts = '-m "{}"'.format(message)
     else:
         git_opts = '-F {}'.format(message_file)
 
