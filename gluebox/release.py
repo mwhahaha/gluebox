@@ -22,8 +22,12 @@ class GlueboxReleaseBase(GlueboxCommandBase):
     def _update_modules(self, workspace, parsed_args):
         for mod in self._get_modules(parsed_args):
             path = os.path.abspath('{}/{}'.format(parsed_args.workspace, mod))
-            metadata = MetadataManager(path, parsed_args.namespace)
-            info = {'version': str(metadata.get_current_version()),
+            if parsed_args.static_version:
+                version = parsed_args.static_version
+            else:
+                metadata = MetadataManager(path, parsed_args.namespace)
+                version = str(metadata.get_current_version())
+            info = {'version': version,
                     'projects': [
                         {'repo': '{}/{}'.format(parsed_args.namespace, mod),
                          'hash': gitutils.get_hash(path, parsed_args.branch)}
@@ -87,6 +91,9 @@ class NewRelease(GlueboxReleaseBase):
                             default=False,
                             help='Create a stable branch entry for the version'
                                  'being released.')
+        parser.add_argument('--static-version',
+                            help='Specify a specific version to use for the '
+                                 'release yaml files.')
         return parser
 
     def take_action(self, parsed_args):
