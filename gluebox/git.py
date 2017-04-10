@@ -65,12 +65,16 @@ class Commit(GlueboxGitBase):
     """Commit changes to the module in the workspace"""
     def get_parser(self, prog_name):
         parser = super(Commit, self).get_parser(prog_name)
-        parser.add_argument('-F', '--commit-message-file', default=None,
+        commit = parser.add_mutually_exclusive_group(required=True)
+        commit.add_argument('-F', '--commit-message-file', default=None,
                             help='File that contains the commit message to '
                                  'use when committing. If not provided a '
                                  'generic commit message will be used.')
-        parser.add_argument('-a', '--amend', action='store_true', default=False,
-                            help='Use ammend to update an existing patch')
+        commit.add_argument('-M', '--commit-message', default=None,
+                            help='A message string to use when committing')
+        commit.add_argument('--fixup', action='store_true', default=False,
+                            help='For use with an existing patch, just amend '
+                                 'with no commit message update.')
         return parser
 
     def take_action(self, parsed_args):
@@ -82,15 +86,15 @@ class Commit(GlueboxGitBase):
                 raise Exception("missing commit message file")
             git_message_file = '{}'.format(
                 os.path.abspath(parsed_args.commit_message_file))
-        else:
-            git_message = '-m "Updating module versions"'
+        elif parsed_args.commit_message:
+            git_message = '-m "{}"'.format(parsed_args.commit_message)
 
         for mod in self._get_modules(parsed_args):
             mod_path = self._get_mod_path(parsed_args.workspace, mod)
             gitutil.commit(workspace=os.path.abspath(mod_path),
                            message=git_message,
                            message_file=git_message_file,
-                           amend=parsed_args.amend)
+                           fixup=parsed_args.fixup)
 
 
 class PushReview(GlueboxGitBase):

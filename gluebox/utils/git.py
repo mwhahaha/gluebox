@@ -34,7 +34,7 @@ def checkout(git_repo, workspace, branch='master',
     return result
 
 
-def commit(workspace, message=None, message_file=None, amend=False):
+def commit(workspace, message=None, message_file=None, fixup=False):
     cwd = os.getcwd()
     os.chdir(workspace)
 
@@ -44,14 +44,14 @@ def commit(workspace, message=None, message_file=None, amend=False):
         os.chdir(cwd)
         raise Exception("git add failed")
 
-    if message:
-        git_message = '-m {}'.format(message)
+    if fixup:
+        git_opts = '--amend --no-edit'
+    elif message:
+        git_opts = '-m {}'.format(message)
     else:
-        git_message = '-F {}'.format(message_file)
+        git_opts = '-F {}'.format(message_file)
 
-    git_commit = 'git commit {}'.format(git_message)
-    if amend:
-        git_commit = '{} --amend'.format(git_commit)
+    git_commit = 'git commit {}'.format(git_opts)
     result = subprocess.call(git_commit, shell=True)
     if result != 0:
         os.chdir(cwd)
