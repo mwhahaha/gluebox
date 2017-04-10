@@ -41,9 +41,8 @@ class GlueboxReleaseBase(GlueboxCommandBase):
                 data = yaml.load(rfile)
 
             if 'releases' not in data:
-                data['releases'] = []
+                releases = [info]
             else:
-                releases = []
                 for v in data['releases']:
                     if v['version'] == info['version']:
                         print("Found version {}, updating".format(v['version']))
