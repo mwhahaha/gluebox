@@ -66,3 +66,19 @@ static version: (example: 10.1.1)::
     gluebox git cleanup -m puppet-opesntacklib
 
 
+create new release patch::
+
+    gluebox git checkout -f modules.txt
+    gluebox release new pike -f modules.txt
+    gluebox git commit -m releases -F release-message.txt
+    gluebox git review -m releases
+
+
+update existing release patch::
+
+    gluebox review cleanup -f modules.txt
+    gluebox git cleanup -f modules.txt
+    gluebox git checkout -f modules.txt
+    gluebox release update pike 455396 -f modules.txt
+    gluebox git commit -a -m releases -F release-message.txt
+    gluebox git review -m releases

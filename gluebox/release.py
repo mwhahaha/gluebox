@@ -19,6 +19,50 @@ class GlueboxReleaseBase(GlueboxCommandBase):
                                  'Defaults to {}'.format(RELEASE_REPO))
         return parser
 
+    def _update_modules(self, workspace, parsed_args):
+        for mod in self._get_modules(parsed_args):
+            path = os.path.abspath('{}/{}'.format(parsed_args.workspace, mod))
+            metadata = MetadataManager(path, parsed_args.namespace)
+            info = {'version': str(metadata.get_current_version()),
+                    'projects': [
+                        {'repo': '{}/{}'.format(parsed_args.namespace, mod),
+                         'hash': gitutils.get_hash(path, parsed_args.branch)}
+                    ]}
+            release_file = '{}/deliverables/{}/{}.yaml'.format(
+                workspace, parsed_args.release.lower(), mod)
+            if not os.path.exists(release_file):
+                raise Exception('Release file {} does not exist'.format(
+                    release_file))
+            with open(release_file, 'r') as rfile:
+                data = yaml.load(rfile)
+
+            if 'releases' not in data:
+                data['releases'] = []
+            else:
+                releases = []
+                for v in data['releases']:
+                    if v['version'] == info['version']:
+                        print("Found version {}, updating".format(v['version']))
+                        releases.append(info)
+                    else:
+                        releases.append(v)
+
+            data['releases'] = releases
+
+            if parsed_args.create_stable:
+                stable_branch = 'stable/{}'.format(parsed_args.release)
+                branch_data = {'name': stable_branch,
+                               'location': info['version']}
+                if 'branches' not in data:
+                    data['branches'] = []
+                elif any(v['name'] == stable_branch for v in data['branches']):
+                    raise Exception('Stable branch already defined in release')
+
+                data['branches'].append(branch_data)
+
+            with open(release_file, 'w') as rfile:
+                yaml.dump(data, rfile, explicit_start=True,
+                          default_flow_style=False)
 
 class CleanupRelease(GlueboxReleaseBase):
     """Cleanup the releases workspace"""
@@ -53,43 +97,7 @@ class NewRelease(GlueboxReleaseBase):
                               workspace=workspace)
         else:
             self.log.warning('Reusing checked out release repo.')
-        for mod in self._get_modules(parsed_args):
-            path = os.path.abspath('{}/{}'.format(parsed_args.workspace, mod))
-            metadata = MetadataManager(path, parsed_args.namespace)
-            info = {'version': str(metadata.get_current_version()),
-                    'projects': [
-                        {'repo': '{}/{}'.format(parsed_args.namespace, mod),
-                         'hash': gitutils.get_hash(path, parsed_args.branch)}
-                    ]}
-            release_file = '{}/deliverables/{}/{}.yaml'.format(
-                workspace, parsed_args.release.lower(), mod)
-            if not os.path.exists(release_file):
-                raise Exception('Release file {} does not exist'.format(
-                    release_file))
-            with open(release_file, 'r') as rfile:
-                data = yaml.load(rfile)
-
-            if 'releases' not in data:
-                data['releases'] = []
-            elif any(v['version'] == info['version'] for v in data['releases']):
-                raise Exception('Version already defined in release')
-
-            data['releases'].append(info)
-
-            if parsed_args.create_stable:
-                stable_branch = 'stable/{}'.format(parsed_args.release)
-                branch_data = {'name': stable_branch,
-                               'location': info['version']}
-                if 'branches' not in data:
-                    data['branches'] = []
-                elif any(v['name'] == stable_branch for v in data['branches']):
-                    raise Exception('Stable branch already defined in release')
-
-                data['branches'].append(branch_data)
-
-            with open(release_file, 'w') as rfile:
-                yaml.dump(data, rfile, explicit_start=True,
-                          default_flow_style=False)
+        self._update_modules(workspace, parsed_args)
 
 
 class UpdateRelease(GlueboxReleaseBase):
@@ -111,4 +119,12 @@ class UpdateRelease(GlueboxReleaseBase):
         return parser
 
     def take_action(self, parsed_args):
-        pass
+        workspace = os.path.abspath("{}/{}".format(
+            parsed_args.workspace, 'releases'))
+        if not os.path.exists(workspace):
+            gitutils.checkout(git_repo=parsed_args.release_repo,
+                              workspace=workspace,
+                              git_review=parsed_args.review)
+        else:
+            self.log.warning('Reusing checked out release repo.')
+        self._update_modules(workspace, parsed_args)

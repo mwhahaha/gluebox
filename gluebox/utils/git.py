@@ -3,7 +3,7 @@ import subprocess
 
 
 def checkout(git_repo, workspace, branch='master',
-             topic=None):
+             topic=None, git_review=None):
     print('Checkout out {} ({})...'.format(git_repo, branch))
     git_cmd = "git clone {r} -b {b} {w}".format(
         r=git_repo,
@@ -20,12 +20,21 @@ def checkout(git_repo, workspace, branch='master',
         git_cmd = 'git checkout -b {}'.format(topic)
         result = subprocess.call(git_cmd, shell=True)
         if result != 0:
-            raise Exception("git checkout topic failed")
+            raise Exception('git checkout topic failed')
+        os.chdir(cwd)
+
+    if git_review:
+        cwd = os.getcwd()
+        os.chdir(os.path.abspath(workspace))
+        git_cmd = 'git review -d {}'.format(git_review)
+        result = subprocess.call(git_cmd, shell=True)
+        if result != 0:
+            raise Exception('git checkout review failed')
         os.chdir(cwd)
     return result
 
 
-def commit(workspace, message=None, message_file=None):
+def commit(workspace, message=None, message_file=None, amend=False):
     cwd = os.getcwd()
     os.chdir(workspace)
 
@@ -40,7 +49,9 @@ def commit(workspace, message=None, message_file=None):
     else:
         git_message = '-F {}'.format(message_file)
 
-    git_commit = "git commit {}".format(git_message)
+    git_commit = 'git commit {}'.format(git_message)
+    if amend:
+        git_commit = '{} --amend'.format(git_commit)
     result = subprocess.call(git_commit, shell=True)
     if result != 0:
         os.chdir(cwd)

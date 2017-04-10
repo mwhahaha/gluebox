@@ -32,6 +32,8 @@ class Checkout(GlueboxGitBase):
         parser.add_argument('--topic', default=None,
                             help='Topic branch to create for working on '
                                  'after checking out')
+        parser.add_argument('-R', '--gerrit-review', default=None,
+                            help='Checkout a specific gerrit review to update')
         return parser
 
     def take_action(self, parsed_args):
@@ -45,7 +47,8 @@ class Checkout(GlueboxGitBase):
             gitutil.checkout(git_repo=git_repo,
                              workspace=mod_path,
                              branch=parsed_args.branch,
-                             topic=parsed_args.topic)
+                             topic=parsed_args.topic,
+                             git_review=parsed_args.gerrit_review)
 
 class Cleanup(GlueboxGitBase):
     """Remove module from the workspace"""
@@ -66,6 +69,8 @@ class Commit(GlueboxGitBase):
                             help='File that contains the commit message to '
                                  'use when committing. If not provided a '
                                  'generic commit message will be used.')
+        parser.add_argument('-a', '--amend', action='store_true', default=False,
+                            help='Use ammend to update an existing patch')
         return parser
 
     def take_action(self, parsed_args):
@@ -75,7 +80,7 @@ class Commit(GlueboxGitBase):
         if parsed_args.commit_message_file:
             if not os.path.exists(parsed_args.commit_message_file):
                 raise Exception("missing commit message file")
-            git_message_file = '-F {}'.format(
+            git_message_file = '{}'.format(
                 os.path.abspath(parsed_args.commit_message_file))
         else:
             git_message = '-m "Updating module versions"'
@@ -84,7 +89,8 @@ class Commit(GlueboxGitBase):
             mod_path = self._get_mod_path(parsed_args.workspace, mod)
             gitutil.commit(workspace=os.path.abspath(mod_path),
                            message=git_message,
-                           message_file=git_message_file)
+                           message_file=git_message_file,
+                           amend=parsed_args.amend)
 
 
 class PushReview(GlueboxGitBase):
