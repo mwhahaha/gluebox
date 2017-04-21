@@ -6,6 +6,7 @@ import os
 from gluebox.exceptions import MetadataJsonMissing
 from gluebox.utils import version as verutil
 
+
 class MetadataManager(object):
     log = logging.getLogger(__name__)
 

@@ -11,3 +11,7 @@ class InvalidModuleFile(Exception):
 
 class MetadataJsonMissing(Exception):
     """no metadata.json for module"""
+
+
+class RenoConfMissing(Exception):
+    """no reno conf.py for module"""
