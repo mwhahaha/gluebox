@@ -1,8 +1,7 @@
-import copy
 import logging
 import os
 import shutil
-import yaml
+import ruamel.yaml
 
 from gluebox.base import GlueboxCommandBase
 from gluebox.base import GlueboxModuleCommandBase
@@ -40,7 +39,7 @@ class GlueboxReleaseBase(GlueboxModuleCommandBase):
                 raise Exception('Release file {} does not exist'.format(
                     release_file))
             with open(release_file, 'r') as rfile:
-                data = yaml.load(rfile)
+                data = ruamel.yaml.load(rfile, ruamel.yaml.RoundTripLoader)
 
             releases = []
             if 'releases' not in data:
@@ -72,8 +71,9 @@ class GlueboxReleaseBase(GlueboxModuleCommandBase):
                 data['branches'].append(branch_data)
 
             with open(release_file, 'w') as rfile:
-                yaml.dump(data, rfile, explicit_start=True,
-                          default_flow_style=False)
+                ruamel.yaml.round_trip_dump(data, rfile, explicit_start=True,
+                    default_flow_style=False)
+
 
 class CleanupRelease(GlueboxCommandBase):
     """Cleanup the releases workspace"""

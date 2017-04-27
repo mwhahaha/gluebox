@@ -24,7 +24,6 @@ class GlueboxVersionBase(GlueboxModuleCommandBase):
             short_ver = version.replace('-dev', '')
             reno_updater.update_version_info(short_ver, version)
         except RenoConfMissing:
-            print('OHNOES')
             self.log.warning('missing reno for {}'.format('path'))
 
     def get_parser(self, prog_name):
@@ -52,6 +51,9 @@ class GlueboxVersionBase(GlueboxModuleCommandBase):
                             default=False,
                             help='Skip updating the reno configuration '
                                  'version information')
+        parser.add_argument('--json-indent', default=4, type=int,
+                            help='Default indent to use when writing out '
+                                 'the json metadata file. Defaults to 4.')
         return parser
 
 
@@ -63,7 +65,8 @@ class MajorBump(GlueboxVersionBase):
             self.app.stdout.write('MajorBump {} ... '.format(mod))
             self._check_module(parsed_args.workspace, mod)
             path = '{}/{}'.format(parsed_args.workspace, mod)
-            updater = MetadataManager(path, parsed_args.namespace)
+            updater = MetadataManager(path, parsed_args.namespace,
+                                      parsed_args.json_indent)
             v = updater.major_bump(static_version=parsed_args.static_version,
                                    dev=parsed_args.dev,
                                    skip_update_deps=parsed_args.skip_update_deps)
@@ -79,10 +82,28 @@ class MinorBump(GlueboxVersionBase):
             self.app.stdout.write('MinorBump {} ... '.format(mod))
             self._check_module(parsed_args.workspace, mod)
             path = '{}/{}'.format(parsed_args.workspace, mod)
-            updater = MetadataManager(path, parsed_args.namespace)
+            updater = MetadataManager(path, parsed_args.namespace,
+                                      parsed_args.json_indent)
             v = updater.minor_bump(static_version=parsed_args.static_version,
                                    dev=parsed_args.dev,
                                    skip_update_deps=parsed_args.skip_update_deps)
+            if not parsed_args.skip_reno:
+                self._update_reno(path, v)
+            self.app.stdout.write('{}\n'.format(v))
+
+
+class BugfixBump(GlueboxVersionBase):
+    """Perform a bugfix version bump"""
+    def take_action(self, parsed_args):
+        for mod in self._get_modules(parsed_args):
+            self.app.stdout.write('MinorBump {} ... '.format(mod))
+            self._check_module(parsed_args.workspace, mod)
+            path = '{}/{}'.format(parsed_args.workspace, mod)
+            updater = MetadataManager(path, parsed_args.namespace,
+                                      parsed_args.json_indent)
+            v = updater.bugfix_bump(static_version=parsed_args.static_version,
+                                    dev=parsed_args.dev,
+                                    skip_update_deps=parsed_args.skip_update_deps)
             if not parsed_args.skip_reno:
                 self._update_reno(path, v)
             self.app.stdout.write('{}\n'.format(v))
@@ -95,7 +116,8 @@ class DevBump(GlueboxVersionBase):
             self.app.stdout.write('DevBump {} ... '.format(mod))
             self._check_module(parsed_args.workspace, mod)
             path = '{}/{}'.format(parsed_args.workspace, mod)
-            updater = MetadataManager(path, parsed_args.namespace)
+            updater = MetadataManager(path, parsed_args.namespace,
+                                      parsed_args.json_indent)
             v = updater.dev_remove(static_version=parsed_args.static_version)
             self.app.stdout.write('{}\n'.format(v))
             if not parsed_args.skip_reno:

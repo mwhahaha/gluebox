@@ -3,6 +3,7 @@ import json
 import re
 import os
 
+from collections import OrderedDict
 from gluebox.exceptions import MetadataJsonMissing
 from gluebox.utils import version as verutil
 
@@ -10,10 +11,11 @@ from gluebox.utils import version as verutil
 class MetadataManager(object):
     log = logging.getLogger(__name__)
 
-    def __init__(self, path, namespace):
+    def __init__(self, path, namespace, indent=4):
         self.module_path = path
         self.namespace = namespace
         self.metadata = None
+        self.indent = indent
 
     def _parse(self):
         if self.metadata:
@@ -23,7 +25,7 @@ class MetadataManager(object):
         if not os.path.exists(json_file):
             raise MetadataJsonMissing()
         with open(json_file) as f:
-            self.metadata = json.load(f)
+            self.metadata = json.load(f, object_pairs_hook=OrderedDict)
 
         return self.metadata
 
@@ -35,8 +37,8 @@ class MetadataManager(object):
     def _write(self):
         json_file = '{}/metadata.json'.format(self.module_path)
         with open(json_file, 'w') as f:
-            f.write(json.dumps(self.metadata, sort_keys=True, indent=4,
-                    separators=(',', ': ')))
+            f.write(json.dumps(self.metadata, sort_keys=False,
+                    indent=self.indent, separators=(',', ': ')))
 
     def _fix_dependencies_major(self):
         updated_deps = []
@@ -84,6 +86,26 @@ class MetadataManager(object):
             updated_deps.append(dep)
         self.metadata['dependencies'] = updated_deps
 
+    def _fix_dependencies_bugfix(self):
+        updated_deps = []
+        for dep in self.metadata['dependencies']:
+            if self.namespace in dep['name']:
+                (min_ver, max_ver) = dep['version_requirement'].split(' ')
+                min_parts = self._parse_ver(min_ver)
+                min_ver = (
+                    min_parts[0],
+                    verutil.bugfix_bump(min_parts[1]),
+                    min_parts[2]
+                )
+                dep['version_requirement'] = "{} {}".format(
+                    "".join(filter(None, min_ver)),
+                    "".join(filter(None, max_ver))
+                )
+                print("Updating {} to {}".format(
+                    dep['name'], dep['version_requirement']))
+            updated_deps.append(dep)
+        self.metadata['dependencies'] = updated_deps
+
     def get_current_version(self):
         self._parse()
         return self.metadata['version']
@@ -112,6 +134,19 @@ class MetadataManager(object):
         self.metadata['version'] = version
         if not skip_update_deps:
             self._fix_dependencies_minor()
+        self._write()
+        return version
+
+    def bugfix_bump(self, static_version=None, dev=False, skip_update_deps=False):
+        self._parse()
+        if static_version:
+            version = verutil.gen_static_version(static_version, dev)
+        else:
+            version = verutil.bugfix_bump(self.metadata['version'], dev)
+        print("Version is {}".format(version))
+        self.metadata['version'] = version
+        if not skip_update_deps:
+            self._fix_dependencies_bugfix()
         self._write()
         return version
 

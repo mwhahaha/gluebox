@@ -31,5 +31,15 @@ def minor_bump(version, dev=False):
     )
 
 
+def bugfix_bump(version, dev=False):
+    version_parts = _split_version(version)
+    return '{}.{}.{}{}'.format(
+        version_parts[0],
+        version_parts[1],
+        int(version_parts[2]) + 1,
+        '-def' if dev else ''
+    )
+
+
 def dev_remove(version):
     return version.replace('-dev', '')

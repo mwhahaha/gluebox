@@ -38,3 +38,9 @@ class TestVersion(base.BaseTestCase):
 
     def test_dev_remove(self):
         self.assertEquals(ver.dev_remove('1.0.0-dev'), '1.0.0')
+
+    def test_bugfix_bump(self):
+        self.assertEquals(ver.bugfix_bump('1.0.0'), '1.0.1')
+        self.assertEquals(ver.bugfix_bump('1.1.0'), '1.1.1')
+        self.assertEquals(ver.bugfix_bump('1.1.1'), '1.1.2')
+        self.assertEquals(ver.bugfix_bump('1.0.0', True), '1.0.1-dev')
