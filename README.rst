@@ -38,10 +38,10 @@ remove -dev from version numbers (example: 10.0.0-dev -> 10.0.0)::
     gluebox git cleanup -f modules.txt
 
 
-bugfix version bump with -dev (example: 10.0.0 -> 10.1.0-dev)::
+bugfix version bump with -dev (example: 10.1.0 -> 10.1.1-dev)::
 
     gluebox git checkout -f modules.txt --topic minor-version-10.1.1-dev
-    gluebox bum bugfix -f modules.txt --dev
+    gluebox bump bugfix -f modules.txt --dev
     gluebox git commit -F release-message.txt -f modules.txt --skip-update-deps
     gluebox git review -f modules.txt
     gluebox git cleanup -f modules.txt

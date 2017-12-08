@@ -71,7 +71,7 @@ class MajorBump(GlueboxVersionBase):
                                    dev=parsed_args.dev,
                                    skip_update_deps=parsed_args.skip_update_deps)
             if not parsed_args.skip_reno:
-                self._update_reno(path, v)
+                self._update_reno(path, '')
             self.app.stdout.write('{}\n'.format(v))
 
 
@@ -88,7 +88,7 @@ class MinorBump(GlueboxVersionBase):
                                    dev=parsed_args.dev,
                                    skip_update_deps=parsed_args.skip_update_deps)
             if not parsed_args.skip_reno:
-                self._update_reno(path, v)
+                self._update_reno(path, '')
             self.app.stdout.write('{}\n'.format(v))
 
 
@@ -105,7 +105,7 @@ class BugfixBump(GlueboxVersionBase):
                                     dev=parsed_args.dev,
                                     skip_update_deps=parsed_args.skip_update_deps)
             if not parsed_args.skip_reno:
-                self._update_reno(path, v)
+                self._update_reno(path, '')
             self.app.stdout.write('{}\n'.format(v))
 
 
@@ -121,5 +121,5 @@ class DevBump(GlueboxVersionBase):
             v = updater.dev_remove(static_version=parsed_args.static_version)
             self.app.stdout.write('{}\n'.format(v))
             if not parsed_args.skip_reno:
-                self._update_reno(path, v)
+                self._update_reno(path, '')
             self.app.stdout.write('{}\n'.format(v))

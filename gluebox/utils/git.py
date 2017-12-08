@@ -79,13 +79,16 @@ def get_hash(workspace, branch='master'):
     cwd = os.getcwd()
     os.chdir(workspace)
 
-    git_add = ['git','rev-parse', 'origin/{}'.format(branch)]
+    git_revparse = ['git','rev-parse', 'origin/{}'.format(branch)]
 
-    proc = subprocess.Popen(git_add,
+    print("{} -> {}".format(workspace, git_revparse))
+    proc = subprocess.Popen(git_revparse,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     sha1, err = proc.communicate()
+    print("SHA1: {}".format(sha1))
     result = proc.returncode
+
 
     if result != 0:
         os.chdir(cwd)
